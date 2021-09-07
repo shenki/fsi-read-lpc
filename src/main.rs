@@ -123,6 +123,10 @@ extern "C" {
     pub fn pib_write(target: *mut pdbg_target, addr: u64, val: u64) -> ::std::os::raw::c_int;
 }
 
+pub const LPC_CMD_REG: u64 = 0x90041;
+pub const LPC_DATA_REG: u64 = 0x90042;
+pub const LPC_STATUS_REG: u64 = 0x90043;
+
 fn main() {
     let mut args: Vec<String> = env::args().collect();
 
@@ -155,13 +159,13 @@ fn main() {
         panic!("pdbg_target_probe: {}", status);
     }
 
-    let r = unsafe { pib_write(target, 0x90041, 0x80400000F0000000 | addr) };
+    let r = unsafe { pib_write(target, LPC_CMD_REG, 0x80400000F0000000 | addr) };
     if r != 0 {
         panic!("pib_write(0x90041, 0x80400000F0000000 | addr) failed");
     }
 
     let mut value: u64 = 0;
-    let r = unsafe { pib_read(target, 0x90043, &mut value) } ;
+    let r = unsafe { pib_read(target, LPC_STATUS_REG, &mut value) } ;
     if r != 0 {
         panic!("pib_read(0x90043) failed");
     }
@@ -170,7 +174,7 @@ fn main() {
     }
 
     let mut value: u64 = 0;
-    let r = unsafe { pib_read(target, 0x90042, &mut value) } ;
+    let r = unsafe { pib_read(target, LPC_DATA_REG, &mut value) } ;
     if r != 0 {
         panic!("pib_read(0x90042) failed");
     }
